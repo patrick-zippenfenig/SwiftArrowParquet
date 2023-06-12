@@ -19,7 +19,7 @@ final class SwiftArrowParquetTests: XCTestCase {
         properties.setCompression(type: .lz4, path: "id")
         properties.setCompression(type: .lz4, path: "data")
         properties.setCompression(type: .lz4, path: "time")
-        let writer = try ParquetFileWriter(path: "/Users/patrick/Downloads/test.pq", schema: schema, properties: properties)
+        let writer = try ParquetFileWriter(path: "./test.pq", schema: schema, properties: properties)
         try writer.write(table: table, chunkSize: 5)
         try writer.write(table: table, chunkSize: 5)
         try writer.close()
