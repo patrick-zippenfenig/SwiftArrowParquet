@@ -3,9 +3,9 @@ import XCTest
 
 final class SwiftArrowParquetTests: XCTestCase {
     func testExample() throws {
-        let array = try ArrowArray([1,2,3,4,5])
-        let schema = try ArrowSchema(["test": array])
+        let schema = try ArrowSchema(["test": .float])
         
+        let array = try ArrowArray([1,2,3,4,5])
         let table = try ArrowTable(schema: schema, arrays: [array])
         
         let properties = ParquetWriterProperties()
