@@ -3,11 +3,13 @@ import XCTest
 
 final class SwiftArrowParquetTests: XCTestCase {
     func testExample() throws {
-        // XCTest Documenation
-        // https://developer.apple.com/documentation/xctest
-
-        // Defining Test Cases and Test Methods
-        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
-        test()
+        let array = ArrowArray([1,2,3,4,5])
+        let schema = ArrowSchema(["test": array])
+        
+        let table = ArrowTable(schema: schema, arrays: [array])
+        
+        let writer = ParquetFileWriter(path: "/Users/patrick/Downloads/test.pq", schema: schema)
+        writer.write(table: table)
+        writer.write(table: table)
     }
 }
