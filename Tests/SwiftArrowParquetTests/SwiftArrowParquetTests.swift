@@ -1,5 +1,5 @@
 import XCTest
-@testable import SwiftArrowParquet
+/*@testable*/ import SwiftArrowParquet
 
 final class SwiftArrowParquetTests: XCTestCase {
     func testExample() throws {

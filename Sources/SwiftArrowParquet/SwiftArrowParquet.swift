@@ -9,7 +9,7 @@ enum ArrowError: Error {
     case fileWriterError(message: String)
 }
 
-final class ArrowSchema {
+public final class ArrowSchema {
     let ptr: UnsafeMutablePointer<GArrowSchema>
                                     
     public init(_ columns: [String: ArrowArray]) throws {
@@ -32,7 +32,7 @@ final class ArrowSchema {
 }
 
 
-final class ArrowTable {
+public final class ArrowTable {
     let ptr: UnsafeMutablePointer<GArrowTable>
     
     public init(schema: ArrowSchema, arrays: [ArrowArray]) throws {
@@ -52,7 +52,7 @@ final class ArrowTable {
 }
 
 
-final class ArrowArray {
+public final class ArrowArray {
     let ptr: UnsafeMutablePointer<GArrowArray>
     
     public init(_ array: [Float]) throws {
@@ -78,7 +78,7 @@ final class ArrowArray {
     }
 }
 
-enum ArrowCompressionType {
+public enum ArrowCompressionType {
     case uncompressed
     case snappy
     case gzip
@@ -110,7 +110,7 @@ enum ArrowCompressionType {
     }
 }
 
-final class ParquetWriterProperties {
+public final class ParquetWriterProperties {
     let ptr: UnsafeMutablePointer<GParquetWriterProperties>
     
     public init() {
@@ -142,7 +142,7 @@ final class ParquetWriterProperties {
 }
 
 
-final class ParquetFileWriter {
+public final class ParquetFileWriter {
     var ptr: UnsafeMutablePointer<GParquetArrowFileWriter>?
     
     public init(path: String, schema: ArrowSchema, properties: ParquetWriterProperties = .init()) throws {
