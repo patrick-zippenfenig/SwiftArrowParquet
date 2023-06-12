@@ -1,0 +1,5 @@
+module CApacheParquetGlib [system] {
+  header "shim.h"
+  link "parquet-glib"
+  export *
+}

@@ -1,0 +1,5 @@
+module CApacheArrowGlib [system] {
+  header "shim.h"
+  link "arrow-glib"
+  export *
+}
