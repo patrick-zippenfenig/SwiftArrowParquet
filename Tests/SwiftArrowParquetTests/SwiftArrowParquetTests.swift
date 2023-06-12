@@ -3,15 +3,16 @@ import XCTest
 
 final class SwiftArrowParquetTests: XCTestCase {
     func testExample() throws {
-        let array = ArrowArray([1,2,3,4,5])
-        let schema = ArrowSchema(["test": array])
+        let array = try ArrowArray([1,2,3,4,5])
+        let schema = try ArrowSchema(["test": array])
         
-        let table = ArrowTable(schema: schema, arrays: [array])
+        let table = try ArrowTable(schema: schema, arrays: [array])
         
         let properties = ParquetWriterProperties()
         properties.setCompression(type: .lz4, path: ".")
-        let writer = ParquetFileWriter(path: "/Users/patrick/Downloads/test.pq", schema: schema, properties: properties)
-        writer.write(table: table)
-        writer.write(table: table)
+        let writer = try ParquetFileWriter(path: "/Users/patrick/Downloads/test.pq", schema: schema, properties: properties)
+        try writer.write(table: table)
+        try writer.write(table: table)
+        try writer.close()
     }
 }

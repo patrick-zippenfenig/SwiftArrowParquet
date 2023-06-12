@@ -2,10 +2,17 @@ import CApacheArrowGlib
 import CApacheParquetGlib
 
 
+enum ArrowError: Error {
+    case schemaError
+    case tableError(message: String)
+    case arrayError(message: String)
+    case fileWriterError(message: String)
+}
+
 final class ArrowSchema {
     let ptr: UnsafeMutablePointer<GArrowSchema>
                                     
-    public init(_ columns: [String: ArrowArray]) {
+    public init(_ columns: [String: ArrowArray]) throws {
         var fields: UnsafeMutablePointer<GList>?
         for (column, array) in columns {
             let dataType = garrow_array_get_value_data_type(array.ptr)
@@ -14,7 +21,7 @@ final class ArrowSchema {
         }
         fields = g_list_reverse(fields)
         guard let schema = garrow_schema_new(fields) else {
-            fatalError()
+            throw ArrowError.schemaError
         }
         ptr = schema
     }
@@ -28,14 +35,13 @@ final class ArrowSchema {
 final class ArrowTable {
     let ptr: UnsafeMutablePointer<GArrowTable>
     
-    public init(schema: ArrowSchema, arrays: [ArrowArray]) {
+    public init(schema: ArrowSchema, arrays: [ArrowArray]) throws {
         var error: UnsafeMutablePointer<GError>? = nil
         var arrayPtr: [UnsafeMutablePointer<GArrowArray>?] = arrays.map { $0.ptr }
         
         guard let table = garrow_table_new_arrays(schema.ptr, &arrayPtr, UInt(arrays.count), &error) else {
-            let errorString: String = String(cString: error!.pointee.message)
-            g_error_free(error)
-            fatalError(errorString)
+            defer { g_error_free(error)}
+            throw ArrowError.tableError(message: error.map {String(cString: $0.pointee.message) } ?? "")
         }
         ptr = table
     }
@@ -49,22 +55,20 @@ final class ArrowTable {
 final class ArrowArray {
     let ptr: UnsafeMutablePointer<GArrowArray>
     
-    public init(_ array: [Float]) {
+    public init(_ array: [Float]) throws {
         var error: UnsafeMutablePointer<GError>?
         let arrayBuilder = garrow_float_array_builder_new()
         defer { g_object_unref(arrayBuilder) }
-        array.withUnsafeBufferPointer( { ptr in
+        try array.withUnsafeBufferPointer( { ptr in
             guard garrow_float_array_builder_append_values(arrayBuilder, ptr.baseAddress, gint64(ptr.count), [], 0, &error) != 0 else {
-                let errorString: String = error != nil ? String(cString: error!.pointee.message) : ""
-                g_error_free(error)
-                fatalError(errorString)
+                defer { g_error_free(error)}
+                throw ArrowError.arrayError(message: error.map {String(cString: $0.pointee.message) } ?? "")
             }
         })
 
         guard let garray = garrow_array_builder_finish(GARROW_ARRAY_BUILDER(arrayBuilder), &error) else {
-            let errorString: String = String(cString: error!.pointee.message)
-            g_error_free(error)
-            fatalError(errorString)
+            defer { g_error_free(error)}
+            throw ArrowError.arrayError(message: error.map {String(cString: $0.pointee.message) } ?? "")
         }
         ptr = garray
     }
@@ -111,7 +115,7 @@ final class ParquetWriterProperties {
     
     public init() {
         guard let properties = gparquet_writer_properties_new() else {
-            fatalError()
+            fatalError("gparquet_writer_properties_new failed")
         }
         ptr = properties
     }
@@ -139,32 +143,38 @@ final class ParquetWriterProperties {
 
 
 final class ParquetFileWriter {
-    let ptr: UnsafeMutablePointer<GParquetArrowFileWriter>
+    var ptr: UnsafeMutablePointer<GParquetArrowFileWriter>?
     
-    public init(path: String, schema: ArrowSchema, properties: ParquetWriterProperties = .init()) {
+    public init(path: String, schema: ArrowSchema, properties: ParquetWriterProperties = .init()) throws {
         var error: UnsafeMutablePointer<GError>? = nil
         guard let writer = gparquet_arrow_file_writer_new_path(schema.ptr, path, properties.ptr, &error) else {
-            let errorString: String = String(cString: error!.pointee.message)
-            g_error_free(error)
-            fatalError(errorString)
+            defer { g_error_free(error)}
+            throw ArrowError.fileWriterError(message: error.map {String(cString: $0.pointee.message) } ?? "")
         }
         ptr = writer
     }
     
-    public func write(table: ArrowTable) {
+    public func write(table: ArrowTable) throws {
         var error: UnsafeMutablePointer<GError>? = nil
         guard gparquet_arrow_file_writer_write_table(ptr, table.ptr, 10, &error) != 0 else {
-            fatalError()
+            defer { g_error_free(error)}
+            throw ArrowError.fileWriterError(message: error.map {String(cString: $0.pointee.message) } ?? "")
         }
     }
     
-    deinit {
+    public func close() throws {
         var error: UnsafeMutablePointer<GError>? = nil
         guard gparquet_arrow_file_writer_close(ptr, &error) != 0 else {
-            let errorString: String = String(cString: error!.pointee.message)
-            g_error_free(error)
-            fatalError(errorString)
+            defer { g_error_free(error)}
+            throw ArrowError.fileWriterError(message: error.map {String(cString: $0.pointee.message) } ?? "")
         }
         g_object_unref(ptr)
+        ptr = nil
+    }
+    
+    deinit {
+        guard ptr == nil else {
+            fatalError("ParquetFileWriter.close() was not called")
+        }
     }
 }
