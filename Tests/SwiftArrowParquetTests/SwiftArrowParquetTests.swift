@@ -8,7 +8,9 @@ final class SwiftArrowParquetTests: XCTestCase {
         
         let table = ArrowTable(schema: schema, arrays: [array])
         
-        let writer = ParquetFileWriter(path: "/Users/patrick/Downloads/test.pq", schema: schema)
+        let properties = ParquetWriterProperties()
+        properties.setCompression(type: .lz4, path: ".")
+        let writer = ParquetFileWriter(path: "/Users/patrick/Downloads/test.pq", schema: schema, properties: properties)
         writer.write(table: table)
         writer.write(table: table)
     }
