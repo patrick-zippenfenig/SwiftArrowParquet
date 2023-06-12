@@ -29,7 +29,8 @@ public final class ArrowArray {
         let arrayBuilder = garrow_timestamp_array_builder_new(unitType)
         defer { g_object_unref(arrayBuilder) }
         try array.withUnsafeBufferPointer( { ptr in
-            guard garrow_timestamp_array_builder_append_values(arrayBuilder, ptr.baseAddress, gint64(ptr.count), [], 0, &error) != 0 else {
+            let p = UnsafeMutableRawPointer(mutating: ptr.baseAddress)?.assumingMemoryBound(to: gint64.self)
+            guard garrow_timestamp_array_builder_append_values(arrayBuilder, p, gint64(ptr.count), [], 0, &error) != 0 else {
                 defer { g_error_free(error)}
                 throw ArrowError.arrayError(message: error.map {String(cString: $0.pointee.message) } ?? "")
             }
@@ -47,7 +48,8 @@ public final class ArrowArray {
         let arrayBuilder = garrow_int64_array_builder_new()
         defer { g_object_unref(arrayBuilder) }
         try array.withUnsafeBufferPointer( { ptr in
-            guard garrow_int64_array_builder_append_values(arrayBuilder, ptr.baseAddress, gint64(ptr.count), [], 0, &error) != 0 else {
+            let p = UnsafeMutableRawPointer(mutating: ptr.baseAddress)?.assumingMemoryBound(to: gint64.self)
+            guard garrow_int64_array_builder_append_values(arrayBuilder, p, gint64(ptr.count), [], 0, &error) != 0 else {
                 defer { g_error_free(error)}
                 throw ArrowError.arrayError(message: error.map {String(cString: $0.pointee.message) } ?? "")
             }
