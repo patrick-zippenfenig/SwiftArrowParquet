@@ -2,7 +2,7 @@
 
 Rudimentary Swift Arrow Parquet Wrapper for the Apache Arrow GLIB library.
 
-WARNING: Sceleton only code. Not much funktionality, but can be extended easily
+WARNING: Skeleton code mostly and limited funktionality, but can be extended easily. Writing a simple Parquet file is currently the only functionality
 
 ## Usage
 
@@ -33,7 +33,7 @@ See https://arrow.apache.org/install/ for more installations instructions
   ```
 
 
-3. Import SwiftArrowParquet and use it. Note: Writing a simple Parquet file is currently the only functionality
+3. Import SwiftArrowParquet and use it.
 
 ```swift
 import SwiftArrowParquet
