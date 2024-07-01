@@ -79,7 +79,7 @@ public enum ArrowDataType {
         case .date64:
             return GARROW_DATA_TYPE(garrow_date64_data_type_new())
         case .timestamp(let unit):
-            return GARROW_DATA_TYPE(garrow_timestamp_data_type_new(unit.gtype))
+            return GARROW_DATA_TYPE(garrow_timestamp_data_type_new(unit.gtype, nil))
         case .time32(let unit):
             guard let type = garrow_time32_data_type_new(unit.gtype, &error) else {
                 defer { g_error_free(error)}

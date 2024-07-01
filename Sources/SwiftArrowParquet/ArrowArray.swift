@@ -24,7 +24,7 @@ public final class ArrowArray {
     
     public init(timestamp array: [Int64], unit: ArrowTimeUnit) throws {
         var error: UnsafeMutablePointer<GError>?
-        let unitType = garrow_timestamp_data_type_new(unit.gtype)
+        let unitType = garrow_timestamp_data_type_new(unit.gtype, nil)
         defer { g_object_unref(unitType) }
         let arrayBuilder = garrow_timestamp_array_builder_new(unitType)
         defer { g_object_unref(arrayBuilder) }
