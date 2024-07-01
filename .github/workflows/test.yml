@@ -48,8 +48,8 @@ jobs:
     - name: Resolve dependencies
       if: steps.cache-resolved-dependencies.outputs.cache-hit != 'true'
       run: ${{ env.swift_package_resolve }}
-    - name: Install netcdf
-      run: brew install netcdf
+    - name: Install apache-arrow-glib
+      run: brew install apache-arrow-glib
     - name: Build
       run: ${{ env.swift_build }}
     - name: Test
@@ -89,8 +89,14 @@ jobs:
         key: ${{ matrix.cache-version }}-${{ runner.os }}-${{ steps.get-swift-version.outputs.version }}-${{ env.cache_version }}-spm-deps-${{ hashFiles('Package.swift', 'Package.resolved') }}
         restore-keys: |
           ${{ matrix.cache-version }}-${{ runner.os }}-${{ steps.get-swift-version.outputs.version }}-${{ env.cache_version }}-spm-deps-
-    - name: Install netcdf
-      run: apt-get update && apt-get -qq -y install libnetcdf-dev
+    - name: Install libarrow-glib-dev libparquet-glib-dev
+      run: |
+        apt update
+        apt install -y -V ca-certificates lsb-release wget
+        wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+        apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+        apt update
+        apt install -y -qq libarrow-glib-dev libparquet-glib-dev
     - name: Resolve dependencies
       if: steps.cache-resolved-dependencies.outputs.cache-hit != 'true'
       run: ${{ env.swift_package_resolve }}
