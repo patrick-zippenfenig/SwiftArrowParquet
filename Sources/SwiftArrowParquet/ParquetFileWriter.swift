@@ -15,7 +15,7 @@ public final class ParquetFileWriter {
     
     public func write(table: ArrowTable, chunkSize: Int) throws {
         var error: UnsafeMutablePointer<GError>? = nil
-        guard gparquet_arrow_file_writer_write_table(ptr, table.ptr, guint64(chunkSize), &error) != 0 else {
+        guard gparquet_arrow_file_writer_write_table(ptr, table.ptr, gsize(chunkSize), &error) != 0 else {
             defer { g_error_free(error)}
             throw ArrowError.fileWriterError(message: error.map {String(cString: $0.pointee.message) } ?? "")
         }
