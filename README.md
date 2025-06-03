@@ -23,7 +23,7 @@ See https://arrow.apache.org/install/ for more installations instructions
 
 ```
   dependencies: [
-    .package(url: "https://github.com/patrick-zippenfenig/SwiftArrowParquet.git", from: "0.0.0")
+    .package(url: "https://github.com/patrick-zippenfenig/SwiftArrowParquet.git", from: "1.0.0")
   ],
   targets: [
     .target(name: "MyApp", dependencies: [
