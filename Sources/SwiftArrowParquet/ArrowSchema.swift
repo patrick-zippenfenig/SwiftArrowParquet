@@ -21,8 +21,8 @@ public final class ArrowSchema {
     }
     
     /// Number of fields in the schema
-    public var countFields: UInt32 {
-        garrow_schema_n_fields(ptr)
+    public var countFields: UInt {
+        UInt(garrow_schema_n_fields(ptr))
     }
     
     /// The string representation of the schema.

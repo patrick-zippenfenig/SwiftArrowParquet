@@ -64,7 +64,7 @@ public final class ArrowArray {
     
     /// The number of rows in the array.
     public var count: Int64 {
-        garrow_array_get_length(ptr)
+        Int64(garrow_array_get_length(ptr))
     }
     
     /// The formatted array content. Throws on error

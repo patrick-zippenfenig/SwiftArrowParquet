@@ -21,8 +21,8 @@ public final class ArrowTable {
     }
     
     /// The number of columns in the table.
-    public var columnCount: UInt64 {
-        return UInt64(garrow_table_get_n_columns(ptr))
+    public var columnCount: UInt {
+        return UInt(garrow_table_get_n_columns(ptr))
     }
     
     /// The formatted table content. Throws on error
