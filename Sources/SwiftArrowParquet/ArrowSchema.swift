@@ -20,6 +20,20 @@ public final class ArrowSchema {
         ptr = schema
     }
     
+    /// Number of fields in the schema
+    public var countFields: UInt32 {
+        garrow_schema_n_fields(ptr)
+    }
+    
+    /// The string representation of the schema.
+    public func toString() -> String {
+        guard let cString = garrow_schema_to_string(ptr) else {
+            return ""
+        }
+        defer { g_free(cString)}
+        return String(cString: cString)
+    }
+    
     deinit {
         g_object_unref(ptr)
     }

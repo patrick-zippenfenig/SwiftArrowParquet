@@ -62,6 +62,22 @@ public final class ArrowArray {
         ptr = garray
     }
     
+    /// The number of rows in the array.
+    public var count: Int64 {
+        garrow_array_get_length(ptr)
+    }
+    
+    /// The formatted array content. Throws on error
+    public func toString() throws -> String {
+        var error: UnsafeMutablePointer<GError>? = nil
+        guard let cString = garrow_array_to_string(ptr, &error) else {
+            defer { g_error_free(error)}
+            throw ArrowError.tableError(message: error.map {String(cString: $0.pointee.message) } ?? "")
+        }
+        defer { g_free(cString)}
+        return String(cString: cString)
+    }
+    
     deinit {
         g_object_unref(ptr)
     }

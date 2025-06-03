@@ -15,6 +15,27 @@ public final class ArrowTable {
         ptr = table
     }
     
+    /// The number of rows in the table.
+    public var rowCount: UInt64 {
+        return UInt64(garrow_table_get_n_rows(ptr))
+    }
+    
+    /// The number of columns in the table.
+    public var columnCount: UInt64 {
+        return UInt64(garrow_table_get_n_columns(ptr))
+    }
+    
+    /// The formatted table content. Throws on error
+    public func toString() throws -> String {
+        var error: UnsafeMutablePointer<GError>? = nil
+        guard let cString = garrow_table_to_string(ptr, &error) else {
+            defer { g_error_free(error)}
+            throw ArrowError.tableError(message: error.map {String(cString: $0.pointee.message) } ?? "")
+        }
+        defer { g_free(cString)}
+        return String(cString: cString)
+    }
+    
     deinit {
         g_object_unref(ptr)
     }
